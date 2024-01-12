@@ -1,0 +1,86 @@
+import random
+from Objet import Objet
+from Arme import Arme
+from Bouclier import Bouclier
+from Nourriture import Nourriture
+from Personnage import Personnage
+from Monstre import Monstre
+from Hero import Hero
+
+
+def demarrer_(equipe_attaquante, equipe_defense, attribut_aleatoire):
+    if attribut_aleatoire == 0:
+        attaquer(equipe_attaquante, equipe_defense)
+    else:
+        attaquer(equipe_defense, equipe_attaquante)
+    
+
+
+def attaquer(equipe_attaquant, equipe_defenseur):
+    attaquants_restants = list(equipe_attaquant.values())
+    defenseurs_restants = list(equipe_defenseur.values())
+
+    while attaquants_restants and defenseurs_restants:
+        attaquant = random.choice(attaquants_restants)
+        defenseur = random.choice(defenseurs_restants)
+
+        print(f"{attaquant.nom} ({attaquant.points_de_vie} PV) ({attaquant.endurance} ST) va affronter  {defenseur.nom} avec {defenseur.arme.nom} ({defenseur.arme.degats} DP) ({defenseur.endurance} ST).\n\n")
+        attaquant.attaquer(defenseur)
+
+        if defenseur.points_de_vie > 0:
+            defenseur.attaquer(attaquant)
+
+        if attaquant.points_de_vie <= 0:
+            del equipe_attaquant[attaquant.nom]
+
+        if defenseur.points_de_vie <= 0:
+            del equipe_defenseur[defenseur.nom]
+
+        attaquants_restants.remove(attaquant)
+        defenseurs_restants.remove(defenseur)
+
+
+def verifier_eliminés(equipe, nom_equipe):
+    if not equipe:
+        print(f"L'equipe {nom_equipe} est eliminee. Fin du jeu !")
+        return True  # Renvoie True si l'équipe est éliminée
+    return False  # Renvoie False sinon
+
+
+def main():
+    # Création des armes et des personnages
+    epee = Arme("Excalibur", 10, 100, 3000)
+    gourdin = Arme("Gourdin de Géant", 15, 150, 5000)
+    heros = Hero("Arthur", 100, 100, epee)
+    monstre = Monstre("Grendel", 120, 80, gourdin)
+    bouclier = Bouclier("Bouclier doree", 8, 80)
+    nourriture = Nourriture("Baie", 1, 20)
+
+    armes = [epee, gourdin]
+    heros_liste = [heros]
+    monstres_liste = [monstre]
+    boucliers = [bouclier]
+
+    equipes = {
+        "Equipe Héros": {
+            "Arthur": heros,
+        },
+        "Equipe Monstres": {
+            "Grendel": monstre,
+        }
+    }
+
+    attribut_aleatoire = bool(random.getrandbits(1))
+    
+    while not (verifier_eliminés(equipes["Equipe Héros"], "Equipe Héros") or verifier_eliminés(equipes["Equipe Monstres"], "Equipe Monstres")):
+    
+        print(f"lES MONSTRES ET LES HEROS VONT S AFFRONTER\n")  
+        print(f"__________________________________________\n")  
+        demarrer_(equipes["Equipe Héros"], equipes["Equipe Monstres"], attribut_aleatoire)
+        attribut_aleatoire = not attribut_aleatoire
+
+        
+        
+
+if __name__ == "__main__":
+    main()

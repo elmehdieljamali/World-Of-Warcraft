@@ -1,0 +1,78 @@
+import random 
+from Arme import Arme
+from Personnage import Personnage, Monstre, Hero
+
+def demarrer_(equipe_heros, equipe_monstres,attribut_aleatoire):
+    
+    if attribut_aleatoire == 0:
+        attaquer(equipe_heros, equipe_monstres) 
+    else:
+        attaquer(equipe_monstres, equipe_heros)
+        
+    attribut_aleatoire = not attribut_aleatoire
+
+        
+
+    
+
+def attaquer(equipe_attaquant, equipe_defenseur):
+    attaquants_restants = list(equipe_attaquant.values())
+    defenseurs_restants = list(equipe_defenseur.values())
+
+    while attaquants_restants and defenseurs_restants:
+        attaquant = random.choice(attaquants_restants)
+        defenseur = random.choice(defenseurs_restants)
+
+        attaquant.attaquer(defenseur)
+
+        if defenseur.points_de_vie > 0:
+            defenseur.attaquer(attaquant)
+
+        if attaquant.points_de_vie <= 0:
+            del equipe_attaquant[attaquant.nom]
+
+        if defenseur.points_de_vie <= 0:
+            del equipe_defenseur[defenseur.nom]
+
+        attaquants_restants.remove(attaquant)
+        defenseurs_restants.remove(defenseur)
+
+def verifier_eliminés(equipe, nom_equipe):
+
+    if not equipe:
+        print(f"L'equipe {nom_equipe} est eliminee. Fin du jeu !")
+        return False
+    return True
+
+
+                
+
+def main():
+
+# Création des armes et des personnages
+    epee = Arme("Excalibur", 10, 100, 3000)
+    gourdin = Arme("Gourdin de Géant", 15, 150, 5000)
+    heros = Hero("Arthur", 100, epee)
+    monstre = Monstre("Grendel", 120, gourdin)
+
+    equipes = {
+        "Equipe Héros": {
+            "Arthur": heros,
+        },
+        "Equipe Monstres": {
+            "Grendel": monstre,
+        }
+    }
+
+
+    while True:
+        attribut_aleatoire = bool(random.getrandbits(1))
+        demarrer_(equipes["Equipe Héros"], equipes["Equipe Monstres"], attribut_aleatoire)
+        
+        if not verifier_eliminés(equipes["Equipe Héros"], "Equipe Héros") or not verifier_eliminés(equipes["Equipe Monstres"], "Equipe Monstres"):
+            break
+    
+    
+if __name__ == "__main__":
+    main()
+
